@@ -1,4 +1,7 @@
 import tkinter as tk
+from tkinter.ttk import Progressbar
+from turtledemo.penrose import start
+
 import requests
 from bs4 import BeautifulSoup
 from tkinter import font
@@ -34,11 +37,13 @@ def check_website(url):
                 output_text.insert(tk.END ,href_value + "\n")  # Yeni linki metin alanına ekle
                 new_links_found = True
 
+
     if not new_links_found:
         output_text.insert(tk.END, "Yeni link bulunamadı.\n")
 
-
 url_list = []
+print(len(url_list))
+
 
 root = tk.Tk()
 root.geometry('700x500')
@@ -48,10 +53,13 @@ root.title("Link Checker")
 label = tk.Label(root, text="Enter URL", bg="#6693fa", fg="white", width=50, font=("Arial", 10, "bold"))
 label.pack()
 
+
+
 # Create an Entry widget
 entry = tk.Entry(root, selectbackground="lightblue", selectforeground="black", width=50)
 entry.pack()
 entry.insert(tk.END, "http://www.google.com")
+
 
 # Create a button to run the function
 button = tk.Button(root, text="RUN", activebackground="#b89c39", activeforeground="white",
@@ -68,9 +76,14 @@ quit_button.pack()
 output_label = tk.Label(root, text="Your Links", bg="#6693fa", fg="white", width=40, padx=10, font=("Arial", 14, "bold"))
 output_label.pack()
 
+#Scrollbar
+scrollbar = tk.Scrollbar(root, orient="vertical")
+scrollbar.pack(side="right", fill="y")
+
 # Text box for output
-output_text = tk.Text(root, height=20, width=70, bg="white", fg="black")
+output_text = tk.Text(root, height=20, width=70, bg="white", fg="black", yscrollcommand=scrollbar.set)
 output_text.pack()
 
+scrollbar.config(command=output_text.yview) #connect with textbox
 
 root.mainloop()
