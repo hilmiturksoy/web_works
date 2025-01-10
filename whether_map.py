@@ -1,79 +1,69 @@
 import tkinter as tk
-from tkinter import ttk, Label, Image
+from tkinter import Label
 import requests
-import json
 from PIL import Image, ImageTk
-from PIL import ImageDraw, ImageTk
-from web_works.link_checker import entry
 
-
-
-#Request https://api.openweathermap.org/data/2.5/weather?q=London&appid={API key}
-
-def city(city):
+def city(city_name):
     api_key = "8cc6d1d2af3d3daff1fd3b8259e536ca"
     url = "https://api.openweathermap.org/data/2.5/weather"
-    params = {"q": city, "appid": api_key}
+    params = {"q": city_name, "appid": api_key}
     r = requests.get(url, params=params)
     data = r.json()
 
-    if r.status_code == 200:
-        temp = f"{round(data['main']['temp'] - 273.15, 2)} °C"
-        description = data['weather'][0]['description']
-        wind_speed = data['wind']['speed']
-        city_name = data['name']
+    try:
 
-        # Get all info
-        print(f"City: {city_name}\nWeather: {description}\nTemperature: {temp}\nWind Speed: {wind_speed} m/s")
-        result = f"City: {city_name}\nWeather: {description}\nTemperature: {temp}\nWind Speed: {wind_speed} m/s"
-        return result
+        if r.status_code == 200:
+            temp = f"{round(data['main']['temp'] - 273.15, 2)} °C"
+            description = data['weather'][0]['description']
+            wind_speed = data['wind']['speed']
+            city_name = data['name']
 
-    else:
+            result = f"City: {city_name}\nWeather: {description}\nTemperature: {temp}\nWind Speed: {wind_speed} m/s"
+            return result
+        else:
+            return f"Error: {r.status_code}"
+    except ValueError:
+        return f"Error: {r.status_code}"
+    except ZeroDivisionError:
+        return f"Error: {r.status_code}"
+    except SyntaxError:
         return f"Error: {r.status_code}"
 
 
 
-#Create WINDOW
-root = tk.Tk() #Window
-root.geometry("800x600")
-root.resizable(True, True)
-root.title("Weather Map")
-root.grid()
-root = Label(root, text="Weather Map") #Label
-root.pack()
+def update_label():
+    result = city(entry.get())
+    label.config(text=result)  # Label'ın metnini güncelle
+    canvas.tag_raise(update_label)  # Arka planın kaybolmaması için güncelleme fonksiyonu
 
-#Entry
-entry = tk.Entry(root, selectbackground="lightblue", selectforeground="black", width=30)
-entry.pack()
-entry.insert(tk.END, "Eskisehir")
 
-#Button
-button = tk.Button(root, text="Check", activebackground="#b89c39", activeforeground="white", width=10, command=lambda: city(entry.get()))
-button.pack()
+root = tk.Tk()
+root.geometry("600x400")
+root.title("Weather App")
 
-#Backgraund
+# Backgraund
 image_path = "D:/Pythonold/9444.jpg"
 image = Image.open(image_path)
-resize_img=image.resize((800, 600))
+resize_img = image.resize((600, 400))
 photo = ImageTk.PhotoImage(resize_img)
 
-
-#Canvas
-canvas = tk.Canvas(root, width=resize_img.width, height=resize_img.height)
+# Canvas
+canvas = tk.Canvas(root, width=800, height=600)
 canvas.pack(fill="both", expand=True)
-
-# Add the background image to the Canvas
 canvas.create_image(0, 0, image=photo, anchor="nw")
 
+# Entry
+entry = tk.Entry(root, width=30)
+entry.place(x=50, y=50)
+entry.insert(0, "Eskisehir")
 
+# Update
+button = tk.Button(root, text="Check", command=update_label)
+button.place(x=50, y=90)
 
-# Add a Label on top of the Canvas
-label = Label(root, text="update_label", bg="lightblue", fg="black", font=("Arial", 16))
+#Label
+label = Label(root, text="Enter a city and click Check", bg="#77addb", fg="white", font=("Times New Roman", 16))
 label.place(x=50, y=210)
 
 
-
-
 root.mainloop()
-
-
